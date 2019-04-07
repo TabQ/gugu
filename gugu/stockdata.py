@@ -68,7 +68,7 @@ class StockData(Base):
                 fq = ''
                 
             kline = '' if autype is None else 'fq'
-            if (start is None or start == '') & (end is None or end == ''):
+            if (start is None or start == '') or (end is None or end == ''):
                 # http://web.ifzq.gtimg.cn/appstock/app/fqkline/get?_var=kline_dayqfq&param=sh600000,day,,,640,qfq&r=0.73327461855388564
                 urls = [cf.HISTORY_URL % (kline, fq, symbol, cf.TT_K_TYPE[ktype.upper()], start, end, fq, Utility.random(17))]
             else:

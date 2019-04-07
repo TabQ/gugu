@@ -56,6 +56,10 @@ CON_BONDS_COLS = ['bond_id', 'bond_nm', 'stock_id', 'stock_nm', 'market', 'conve
                   'redeem_total_days', 'orig_iss_amt', 'curr_iss_amt', 'rating_cd', 'issuer_rating_cd', 'guarantor', 'active_fl', 'ration_rt',
                   'pb', 'sprice', 'sincrease_rt', 'last_time', 'convert_value', 'premium_rt', 'year_left', 'ytm_rt', 'ytm_rt_tax', 'price',
                   'increase_rt', 'volume', 'force_redeem_price', 'put_convert_price', 'convert_amt_ratio', 'stock_cd', 'pre_bond_id']
+NEW_CON_BONDS_URL = 'https://www.jisilu.cn/data/cbnew/pre_list/?page=%s'
+NEW_CON_BONDS_COLS = ['bond_id', 'bond_nm', 'apply_cd', 'apply_date', 'list_date', 'amount', 'convert_price', 'pma_rt', 'stock_id',
+                      'stock_nm', 'price', 'increase_rt', 'ration_rt', 'online_amount', 'lucky_draw_rt', 'individual_limit',
+                      'underwriter_rt', 'rating_cd', 'progress_nm', 'apply_tips', 'valid_apply']
 CLOSED_STOCK_FUND_URL = 'https://www.jisilu.cn/data/cf/cf_list/?page=%s'
 CLOSED_STOCK_FUND_COLS = ['fund_id', 'fund_nm', 'issue_dt', 'duration', 'last_time', 'price', 'increase_rt', 'volume', 'net_value',
                           'nav_dt', 'realtime_estimate_value', 'discount_rt', 'left_year', 'annualize_dscnt_rt', 'quote_incr_rt',

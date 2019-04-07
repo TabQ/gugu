@@ -11,12 +11,14 @@ import re
 import json
 import pandas as pd
 import numpy as np
-from gugu.base import Base, cf
+from gugu.base import Base
+import gugu.config as cf
+import sys
 
 class LowRiskIntArb(Base):
     def ratingFundA(self):
         """
-        分级基金A及其相关数据
+                            分级基金A及其相关数据
         return
         ------
         DataFrame or List: [{'funda_id':, 'funda_name':, ...}, ...]
@@ -66,7 +68,7 @@ class LowRiskIntArb(Base):
     
     def ratingFundB(self):
         """
-        分级基金B及其相关数据
+                            分级基金B及其相关数据
         return
         ------
         DataFrame or List: [{'fundb_id':, 'fundb_name':, ...}, ...]
@@ -122,7 +124,7 @@ class LowRiskIntArb(Base):
     
     def ratingFundM(self):
         """
-        分级基金母基金及其相关数据
+                            分级基金母基金及其相关数据
         return
         ------
         DataFrame or List: [{'base_fund_id':, 'base_fund_nm', ...}, ...]
@@ -160,7 +162,7 @@ class LowRiskIntArb(Base):
     
     def conBonds(self):
         """
-        可转债及其相关数据
+                            可转债及其相关数据
         return
         ------
         DataFrame or List: [{'bond_id':, 'bond_nm':, ...}, ...]
@@ -219,9 +221,47 @@ class LowRiskIntArb(Base):
         return self._result()
     
     
+    def newConBonds(self):
+        """
+                            新转债及其相关数据
+        return
+        ------
+        DataFrame or List: [{'bond_id':, 'bond_nm':, ...}, ...]
+            bond_id:                    转债代码
+            bond_nm:                    转债名称
+            apply_cd:                   申购代码
+            apply_date:                 申购日期
+            list_date:                  上市日期
+            amount:                     发行规模（亿元）
+            convert_price:              转股价
+            pma_rt:                     现价比转股价
+            stock_id:                   正股代码
+            stock_nm:                   正股名称
+            price:                      正股现价
+            increase_rt:                正股涨跌幅
+            ration_rt:                  股东配售率（％）
+            online_amount:              网上规模（亿元）
+            lucky_draw_rt:              中签率（％）
+            individual_limit:           个人申购限额
+            underwriter_rt:             包销比例（％）
+            rating_cd:                  评级
+            progress_nm:                方案进展
+            apply_tips:                 申购提示
+            valid_apply:                申购户数（万户）
+        """
+        self._data = pd.DataFrame()
+        
+        self._data = self.__parsePage(cf.NEW_CON_BONDS_URL, cf.NEW_CON_BONDS_COLS)
+        for col in ['amount', 'convert_price', 'pma_rt', 'price', 'increase_rt', 'ration_rt',
+                    'online_amount', 'lucky_draw_rt', 'underwriter_rt', 'valid_apply']:
+            self._data[col] = self._data[col].astype(float)
+        
+        return self._result()
+    
+    
     def closedStockFund(self):
         """
-        封闭股基及其相关数据
+                            封闭股基及其相关数据
         return
         ------
         DataFrame or List: [{'fund_id':, 'fund_nm':, ...}, ...]
@@ -261,7 +301,7 @@ class LowRiskIntArb(Base):
     
     def closedBondFund(self):
         """
-        封闭债基及其相关数据
+                            封闭债基及其相关数据
         return
         ------
         DataFrame or List: [{'fund_id':, 'fund_nm':, ...}, ...]
@@ -372,7 +412,7 @@ class LowRiskIntArb(Base):
     
     def stockLof(self):
         """
-        股票LOF基金及基相关数据
+                            股票LOF基金及基相关数据
         return
         ------
         DataFrame or List: [{'fund_id':, 'fund_nm':, ...}, ...]
@@ -404,7 +444,7 @@ class LowRiskIntArb(Base):
     
     def indexLof(self):
         """
-        指数LOF基金及基相关数据
+                            指数LOF基金及基相关数据
         return
         ------
         DataFrame or List: [{'fund_id':, 'fund_nm':, ...}, ...]

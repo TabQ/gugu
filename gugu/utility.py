@@ -7,6 +7,7 @@ Created on 2019/01/15
 @contact: 16621596@qq.com
 """
 
+from __future__ import division
 import datetime
 import json
 import requests
@@ -21,6 +22,23 @@ class Utility():
         string = json.dumps(string)
         
         return json.loads(string)
+    
+    
+    @staticmethod
+    def fceil(number, ndigits=2):
+        if number == 0:
+            return number
+        
+        tail_number = 1 / pow(10, ndigits)
+        ndigits_number = round(number, ndigits)
+        
+        result = number - ndigits_number
+        if result == 0:
+            return number
+        elif result > 0:
+            return ndigits_number + tail_number
+        else:
+            return ndigits_number
     
     
     @staticmethod
@@ -44,7 +62,7 @@ class Utility():
     @staticmethod
     def symbol(code):
         """
-        生成symbol代码标志
+                            生成symbol代码标志
         """
         if code in cf.INDEX_LABELS:
             return cf.INDEX_LIST[code]
@@ -86,23 +104,23 @@ class Utility():
     
     @staticmethod
     def getTodayLastYear():
-        return str(Utility.getTodayHistory(-365))
+        return str(Utility.getDateInterval(days=-365))
 
     
     @staticmethod
     def getTodayLastMonth():
-        return str(Utility.getTodayHistory(-30))
+        return str(Utility.getDateInterval(days=-30))
         
     
     @staticmethod
     def getTodayLastWeek():
-        return str(Utility.getTodayHistory(-7))
-    
-    
-    @staticmethod
-    def getTodayHistory(days):
-        return datetime.datetime.today().date() + datetime.timedelta(days)
+        return str(Utility.getDateInterval(days=-7))
         
+        
+    @staticmethod
+    def getDateInterval(date=str(datetime.datetime.today().date()), days=-1):
+        return datetime.datetime.strptime(date, '%Y-%m-%d').date() + datetime.timedelta(days)
+    
     
     @staticmethod
     def diffDays(start=None, end=None):
@@ -123,26 +141,33 @@ class Utility():
     
     
     @staticmethod
-    def lastTradeDate():
-        today = datetime.datetime.today().date()
-        today=int(today.strftime("%w"))
+    def lastTradeDate(date=str(datetime.datetime.today().date())):
+        lastdate = str(Utility.getDateInterval(date, -1))
         
-        if today == 0:
-            return Utility.getTodayHistory(-2)
-        elif today == 1:
-            return Utility.getTodayHistory(-3)
+        if Utility.isTradeDay(lastdate):
+            return lastdate
         else:
-            return Utility.getTodayHistory(-1)
+            return Utility.lastTradeDate(lastdate)
+        
+        
+    @staticmethod
+    def nextTradeDate(date=str(datetime.datetime.today().date())):
+        nextdate = str(Utility.getDateInterval(date, 1))
+        
+        if Utility.isTradeDay(nextdate):
+            return nextdate
+        else:
+            return Utility.nextTradeDate(nextdate)
         
         
     @staticmethod
     def isHoliday(date=str(datetime.datetime.today().date())):
         """
-        节假日判断
+                            节假日判断
         Parameters
         ------
             date: string
-                查询日期 format：YYYY-MM-DD 为空时取当前日期
+                                                        查询日期 format：YYYY-MM-DD 为空时取当前日期
         return
         ------
             True or False
@@ -169,11 +194,11 @@ class Utility():
     @staticmethod
     def isTradeDay(date=str(datetime.datetime.today().date())):
         """
-        交易日判断
+                            交易日判断
         Parameters
         ------
             date: string
-                查询日期 format：YYYY-MM-DD 为空时取当前日期
+                                                        查询日期 format：YYYY-MM-DD 为空时取当前日期
         return
         ------
             True or False
