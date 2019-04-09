@@ -7,7 +7,6 @@ Created on 2018/12/26
 @contact: 16621596@qq.com
 """
 
-VERSION = '0.1.5'
 HOLIDAY_URL = 'http://timor.tech/api/holiday/info/%s'
 K_LABELS = ['D', 'W', 'M']
 K_MIN_LABELS = ['5', '15', '30', '60']

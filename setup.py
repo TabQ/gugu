@@ -11,7 +11,7 @@ except (IOError, ImportError):
 
 setup(
     name='gugu',
-    version='0.1.5',
+    version='0.1.7',
     description='an api for getting financial data',
     long_description=long_description,
     author='TabQ',

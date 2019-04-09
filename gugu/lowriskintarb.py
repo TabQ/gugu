@@ -48,7 +48,7 @@ class LowRiskIntArb(Base):
         self._data = pd.DataFrame()
         
         self._data = self.__parsePage(cf.RATING_FUNDA_URL, cf.RATING_FUNDA_COLS)
-        self._data[self._data=="-"] = np.NaN
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         self._data['next_recalc_dt'] = self._data['next_recalc_dt'].map(self.__nextRecalcDt)
         for col in ['funda_current_price', 'funda_increase_rt', 'funda_volume', 'funda_value',
                     'funda_discount_rt', 'funda_coupon', 'funda_coupon_next', 'funda_profit_rt_next', 
@@ -110,7 +110,7 @@ class LowRiskIntArb(Base):
         self._data = pd.DataFrame()
         
         self._data = self.__parsePage(cf.RATING_FUNDB_URL, cf.RATING_FUNDB_COLS)
-        self._data[self._data=="-"] = np.NaN
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         for col in ['coupon', 'manage_fee', 'funda_current_price', 'funda_upper_price', 'funda_lower_price',
                     'funda_increase_rt', 'fundb_current_price', 'fundb_upper_price', 'fundb_lower_price',
                     'fundb_increase_rt', 'fundb_volume', 'fundb_value', 'fundm_value', 'fundb_discount_rt',
@@ -152,7 +152,7 @@ class LowRiskIntArb(Base):
         self._data = pd.DataFrame()
         
         self._data = self.__parsePage(cf.RATING_FUNDM_URL, cf.RATING_FUNDM_COLS)
-        self._data[self._data=="-"] = np.NaN
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         for col in ['manage_fee', 'lower_recalc_price', 'a_ratio', 'b_ratio', 'coupon', 'coupon_next',
                     'price', 'base_lower_recalc_rt']:
             self._data[col] = self._data[col].astype(float)
@@ -211,7 +211,8 @@ class LowRiskIntArb(Base):
         self._data = pd.DataFrame()
         
         self._data = self.__parsePage(cf.CON_BONDS_URL, cf.CON_BONDS_COLS)
-        self._data[self._data=="-"] = np.NaN
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
+        self._data['sincrease_rt'] = self._data['sincrease_rt'].map(lambda x: 0 if x.encode('utf-8') == "停牌" else x)
         for col in ['convert_price', 'put_price', 'redeem_price', 'redeem_price_ratio', 'orig_iss_amt',
                     'curr_iss_amt', 'ration_rt', 'pb', 'sprice', 'sincrease_rt', 'convert_value', 'premium_rt',
                     'year_left', 'ytm_rt', 'ytm_rt_tax', 'price', 'increase_rt', 'volume', 'force_redeem_price',
@@ -251,6 +252,7 @@ class LowRiskIntArb(Base):
         """
         self._data = pd.DataFrame()
         
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         self._data = self.__parsePage(cf.NEW_CON_BONDS_URL, cf.NEW_CON_BONDS_COLS)
         for col in ['amount', 'convert_price', 'pma_rt', 'price', 'increase_rt', 'ration_rt',
                     'online_amount', 'lucky_draw_rt', 'underwriter_rt', 'valid_apply']:
@@ -290,7 +292,7 @@ class LowRiskIntArb(Base):
         self._data = pd.DataFrame()
         
         self._data = self.__parsePage(cf.CLOSED_STOCK_FUND_URL, cf.CLOSED_STOCK_FUND_COLS)
-        self._data[self._data=="-"] = np.NaN
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         for col in ['price', 'increase_rt', 'volume', 'net_value', 'realtime_estimate_value', 'discount_rt',
                     'left_year', 'annualize_dscnt_rt', 'quote_incr_rt', 'nav_incr_rt', 'spread', 'stock_ratio',
                     'daily_nav_incr_rt', 'daily_spread']:
@@ -327,7 +329,7 @@ class LowRiskIntArb(Base):
         self._data = pd.DataFrame()
         
         self._data = self.__parsePage(cf.CLOSED_BOND_FUND_URL, cf.CLOSED_BOND_FUND_COLS)
-        self._data[self._data=="-"] = np.NaN
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         for col in ['left_year', 'est_val', 'discount_rt', 'annual_discount_rt', 'trade_price',
                     'increase_rt', 'volume', 'fund_nav', 'price_incr_rt', 'stock_ratio', 'bond_ratio']:
             self._data[col] = self._data[col].astype(float)
@@ -358,7 +360,7 @@ class LowRiskIntArb(Base):
         self._data = pd.DataFrame()
         
         self._data = self.__parsePage(cf.AH_RATIO_URL, cf.AH_RATIO_COLS)
-        self._data[self._data=="-"] = np.NaN
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         for col in ['a_price', 'a_increase_rt', 'h_price', 'h_increase_rt', 'rmb_price',
                     'hk_currency', 'ha_ratio', 'h_free_shares', 'a_free_shares']:
             self._data[col] = self._data[col].astype(float)
@@ -401,7 +403,7 @@ class LowRiskIntArb(Base):
         self._data = pd.DataFrame()
         
         self._data = self.__parsePage(cf.DIVIDEND_RATE_URL, cf.DIVIDEND_RATE_COLS)
-        self._data[self._data=="-"] = np.NaN
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         for col in ['dividend_rate', 'dividend_rate2', 'price', 'volume', 'increase_rt', 'pe', 'pb', 'total_value',
                     'eps_growth_ttm', 'roe', 'revenue_average', 'profit_average', 'roe_average', 'pb_temperature',
                     'pe_temperature', 'int_debt_rate', 'cashflow_average', 'dividend_rate_average', 'dividend_rate5']:
@@ -435,6 +437,7 @@ class LowRiskIntArb(Base):
         self._data = pd.DataFrame()
         
         self._data = self.__parsePage(cf.STOCK_LOF_URL, cf.STOCK_LOF_COLS)
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         for col in ['price', 'increase_rt', 'volume', 'amount', 'fund_nav', 
                     'estimate_value', 'discount_rt', 'stock_ratio', 'stock_increase_rt', 'apply_fee', 'redeem_fee']:
             self._data[col] = self._data[col].astype(float)
@@ -468,6 +471,7 @@ class LowRiskIntArb(Base):
         self._data = pd.DataFrame()
         
         self._data = self.__parsePage(cf.INDEX_LOF_URL, cf.INDEX_LOF_COLS)
+        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         for col in ['price', 'increase_rt', 'volume', 'amount', 'fund_nav', 'estimate_value', 
                     'discount_rt', 'index_increase_rt', 'apply_fee', 'redeem_fee']:
             self._data[col] = self._data[col].astype(float)
