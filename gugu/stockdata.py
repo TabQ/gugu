@@ -249,6 +249,12 @@ class StockData(Base):
         for txt in ls:
             self._data[txt] = self._data[txt].map(lambda x : x[:-2])
             
+        # 价格、成交量等转换为浮点类型
+        for col in ['open', 'pre_close', 'price', 'high', 'low', 'bid', 'ask', 'volume','amount',
+                    'b1_v', 'b1_p', 'b2_v', 'b2_p', 'b3_v', 'b3_p', 'b4_v', 'b4_p', 'b5_v', 'b5_p',
+                    'a1_v', 'a1_p', 'a2_v', 'a2_p', 'a3_v', 'a3_p', 'a4_v', 'a4_p', 'a5_v', 'a5_p']:
+            self._data[col] = self._data[col].astype(float)
+            
         return self._result()
     
     
