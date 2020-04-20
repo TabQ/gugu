@@ -12,6 +12,7 @@ from pandas.compat import StringIO
 import re
 import json
 import numpy as np
+import time
 from gugu.base import Base, cf
 
 
@@ -151,7 +152,8 @@ class MarketData(Base):
         page = 1
         while(True):
             try:
-                request = self._session.get( cf.INDEX_ETF_URL % page )
+                timestamp = int(time.time()*1000)
+                request = self._session.get( cf.INDEX_ETF_URL % (timestamp, page) )
                 text = request.text.replace('%', '')
                 dataDict = json.loads(text)
                 if dataDict['page'] < page:
@@ -166,7 +168,7 @@ class MarketData(Base):
             except Exception as e:
                 print(str(e))
         
-        self._data[self._data=="-"] = np.NaN
+        self._data[self._data.astype(str)=="-"] = np.NaN
         for col in ['creation_unit', 'amount', 'unit_total', 'unit_incr', 'price', 'volume', 'increase_rt',
                     'estimate_value', 'discount_rt', 'fund_nav', 'index_increase_rt', 'pe', 'pb']:
             self._data[col] = self._data[col].astype(float)

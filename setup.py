@@ -11,7 +11,7 @@ except (IOError, ImportError):
 
 setup(
     name='gugu',
-    version='0.1.7',
+    version='0.1.8',
     description='an api for getting financial data',
     long_description=long_description,
     author='TabQ',
@@ -20,7 +20,7 @@ setup(
     license="Apache License, Version 2.0",
     packages=find_packages(),
     install_requires=[
-        'pandas',
+        'pandas==0.24.1',
         'requests',
         'lxml',
         'simplejson',

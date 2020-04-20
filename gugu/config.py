@@ -20,7 +20,7 @@ P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
 PAGE_NUM = [40, 60, 80, 100]
 FORMAT = lambda x: '%.2f' % x
 FORMAT4 = lambda x: '%.4f' % x
-INDEX_ETF_URL = 'https://www.jisilu.cn/jisiludata/etf.php?rp=25&page=%s'
+INDEX_ETF_URL = 'https://www.jisilu.cn/data/etf/etf_list/?___jsl=LST___t=%d&rp=25&page=%d'
 INDEX_ETF_COLS = ['fund_id', 'fund_nm', 'index_id', 'creation_unit', 'amount', 'unit_total',
                   'unit_incr', 'price', 'volume', 'increase_rt', 'estimate_value', 'discount_rt', 
                   'fund_nav', 'nav_dt', 'index_nm', 'index_increase_rt', 'pe', 'pb']
@@ -63,7 +63,7 @@ CLOSED_STOCK_FUND_URL = 'https://www.jisilu.cn/data/cf/cf_list/?page=%s'
 CLOSED_STOCK_FUND_COLS = ['fund_id', 'fund_nm', 'issue_dt', 'duration', 'last_time', 'price', 'increase_rt', 'volume', 'net_value',
                           'nav_dt', 'realtime_estimate_value', 'discount_rt', 'left_year', 'annualize_dscnt_rt', 'quote_incr_rt',
                           'nav_incr_rt', 'spread', 'stock_ratio', 'report_dt', 'daily_nav_incr_rt', 'daily_spread']
-CLOSED_BOND_FUND_URL = 'https://www.jisilu.cn/jisiludata/CloseBondFund.php?page=%s'
+CLOSED_BOND_FUND_URL = 'https://www.jisilu.cn/data/cf/bond_list/?___jsl=LST___t=%s'
 CLOSED_BOND_FUND_COLS = ['fund_id', 'fund_nm', 'maturity_dt', 'left_year', 'est_val', 'discount_rt', 'annual_discount_rt',
                          'trade_price', 'increase_rt', 'volume', 'last_time', 'fund_nav', 'last_chg_dt', 'price_incr_rt',
                          'stock_ratio', 'bond_ratio', 'report_dt', 'is_outdate']
@@ -123,8 +123,14 @@ CASHFLOW_URL = 'http://vip.stock.finance.sina.com.cn/q/go.php/vFinanceAnalyze/ki
 SHIBOR_TYPE ={'Shibor': 'Shibor数据', 'Quote': '报价数据', 'Tendency': 'Shibor均值数据',
               'LPR': 'LPR数据', 'LPR_Tendency': 'LPR均值数据'}
 SHIBOR_DATA_URL = 'http://www.shibor.org/shibor/web/html/downLoad.html?nameNew=Historical_%s_Data_%s.xls&downLoadPath=data&nameOld=%s%s.xls&shiborSrc=http://www.shibor.org/shibor/'
-ALL_STOCK_PROFILES_URL = 'http://s.askci.com/stock/a/?reportTime=%s&pageNum=%s#QueryCondition'
-ALL_STOCK_PROFILES_COLS = ['code', 'name', 'city', 'staff', 'date', 'industry', 'pro_type', 'main']
+LPR_URL = 'http://www.chinamoney.com.cn/ags/ms/cm-u-bk-currency/LprHis?lang=CN&strStartDate=%s&strEndDate=%s'
+XQ_HOME = 'https://xueqiu.com'
+XQ_STOCK_PROFILES_URL = 'https://xueqiu.com/service/v5/stock/screener/quote/list?page=%s&size=90&order=desc&orderby=percent&order_by=percent&market=CN&type=sh_sz&_=%s'
+XQ_STOCK_PROFILES_COLS = ['symbol', 'net_profit_cagr', 'ps', 'percent', 'pb_ttm', 'float_shares', 'current', 
+                          'amplitude', 'pcf', 'current_year_percent', 'float_market_capital', 'market_capital', 
+                          'dividend_yield', 'roe_ttm', 'total_percent', 'income_cagr', 'amount', 'chg', 
+                          'issue_date_ts', 'main_net_inflows', 'volume', 'volume_ratio', 'pb', 'followers', 
+                          'turnover_rate', 'name', 'pe_ttm', 'total_shares']
 SINA_CONCEPTS_INDEX_URL = 'http://money.finance.sina.com.cn/q/view/newFLJK.php?param=class'
 SINA_INDUSTRY_INDEX_URL = 'http://vip.stock.finance.sina.com.cn/q/view/%s'
 SINA_DATA_DETAIL_URL = 'http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?page=1&num=1000&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'

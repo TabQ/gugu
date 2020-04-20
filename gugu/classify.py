@@ -12,16 +12,14 @@ import re
 import pandas as pd
 from gugu.base import Base, cf
 
-class Classify(Base):        
-    def byIndustry(self, std='sina', retry=3, pause=0.001):
+class Classify(Base):
+    def byIndustry(self, retry=3, pause=0.001):
         """
         获取行业分类数据
         Parameters
         ----------
-        std : string
-                sina:新浪行业 sw：申万行业
         retry : int, 默认 10
-                     如遇网络等问题重复执行的次数 
+                     如遇网络等问题重复执行的次数
         pause : int, 默认 0.001
                     重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
         
@@ -34,13 +32,9 @@ class Classify(Base):
         """
         self._data = pd.DataFrame()
         
-        if std == 'sw':
-            # http://vip.stock.finance.sina.com.cn/q/view/SwHy.php
-            df = self.__getTypeData(cf.SINA_INDUSTRY_INDEX_URL % 'SwHy.php')
-        else:
-            # http://vip.stock.finance.sina.com.cn/q/view/newSinaHy.php
-            df = self.__getTypeData(cf.SINA_INDUSTRY_INDEX_URL % 'newSinaHy.php')
-            
+        # http://vip.stock.finance.sina.com.cn/q/view/newSinaHy.php
+        df = self.__getTypeData(cf.SINA_INDUSTRY_INDEX_URL % 'newSinaHy.php')
+
         self._writeHead()
         for row in df.values:
             rowDf =  self.__getDetail(row[0], retry, pause)
@@ -56,7 +50,7 @@ class Classify(Base):
         Parameters
         ----------
         retry : int, 默认 3
-                     如遇网络等问题重复执行的次数 
+                     如遇网络等问题重复执行的次数
         pause : int, 默认 0.001
                     重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
         Return
@@ -71,15 +65,17 @@ class Classify(Base):
         self._writeHead()
         # http://money.finance.sina.com.cn/q/view/newFLJK.php?param=class
         df = self.__getTypeData( cf.SINA_CONCEPTS_INDEX_URL )
-        
+
         for row in df.values:
             rowDf = self.__getDetail(row[0], retry, pause)
             rowDf['c_name'] = row[1]
             self._data = self._data.append(rowDf)
-            
+
+            time.sleep(1)
+        
         return self._result()
-    
-            
+
+
     def __getTypeData(self, url):
         try:
             request = self._session.get(url, timeout=10)
@@ -115,5 +111,3 @@ class Classify(Base):
                 time.sleep((retryCount+1)*10)
             
         raise IOError(cf.NETWORK_ERR_MSG)
-    
-    

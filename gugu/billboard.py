@@ -17,7 +17,7 @@ from gugu.base import Base, cf
 from gugu.utility import Utility
 
 class BillBoard(Base):
-    def topList(self, date = None, retry=3, pause=0.001):
+    def topList(self, date=None, retry=3, pause=0.001):
         """
         获取每日龙虎榜列表
         Parameters

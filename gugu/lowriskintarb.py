@@ -11,6 +11,7 @@ import re
 import json
 import pandas as pd
 import numpy as np
+import time
 from gugu.base import Base
 import gugu.config as cf
 import sys
@@ -18,7 +19,7 @@ import sys
 class LowRiskIntArb(Base):
     def ratingFundA(self):
         """
-                            分级基金A及其相关数据
+        分级基金A及其相关数据
         return
         ------
         DataFrame or List: [{'funda_id':, 'funda_name':, ...}, ...]
@@ -68,7 +69,7 @@ class LowRiskIntArb(Base):
     
     def ratingFundB(self):
         """
-                            分级基金B及其相关数据
+        分级基金B及其相关数据
         return
         ------
         DataFrame or List: [{'fundb_id':, 'fundb_name':, ...}, ...]
@@ -124,7 +125,7 @@ class LowRiskIntArb(Base):
     
     def ratingFundM(self):
         """
-                            分级基金母基金及其相关数据
+        分级基金母基金及其相关数据
         return
         ------
         DataFrame or List: [{'base_fund_id':, 'base_fund_nm', ...}, ...]
@@ -162,7 +163,7 @@ class LowRiskIntArb(Base):
     
     def conBonds(self):
         """
-                            可转债及其相关数据
+        可转债及其相关数据
         return
         ------
         DataFrame or List: [{'bond_id':, 'bond_nm':, ...}, ...]
@@ -212,11 +213,11 @@ class LowRiskIntArb(Base):
         
         self._data = self.__parsePage(cf.CON_BONDS_URL, cf.CON_BONDS_COLS)
         self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
-        self._data['sincrease_rt'] = self._data['sincrease_rt'].map(lambda x: 0 if x.encode('utf-8') == "停牌" else x)
         for col in ['convert_price', 'put_price', 'redeem_price', 'redeem_price_ratio', 'orig_iss_amt',
                     'curr_iss_amt', 'ration_rt', 'pb', 'sprice', 'sincrease_rt', 'convert_value', 'premium_rt',
                     'year_left', 'ytm_rt', 'ytm_rt_tax', 'price', 'increase_rt', 'volume', 'force_redeem_price',
                     'put_convert_price', 'convert_amt_ratio']:
+            self._data[col] = self._data[col].map(lambda x: 0 if isinstance(x, str) and x.encode('utf-8') == "停牌" else x)
             self._data[col] = self._data[col].astype(float)
             
         return self._result()
@@ -224,7 +225,7 @@ class LowRiskIntArb(Base):
     
     def newConBonds(self):
         """
-                            新转债及其相关数据
+        新转债及其相关数据
         return
         ------
         DataFrame or List: [{'bond_id':, 'bond_nm':, ...}, ...]
@@ -263,7 +264,7 @@ class LowRiskIntArb(Base):
     
     def closedStockFund(self):
         """
-                            封闭股基及其相关数据
+        封闭股基及其相关数据
         return
         ------
         DataFrame or List: [{'fund_id':, 'fund_nm':, ...}, ...]
@@ -303,7 +304,7 @@ class LowRiskIntArb(Base):
     
     def closedBondFund(self):
         """
-                            封闭债基及其相关数据
+        封闭债基及其相关数据
         return
         ------
         DataFrame or List: [{'fund_id':, 'fund_nm':, ...}, ...]
@@ -328,41 +329,10 @@ class LowRiskIntArb(Base):
         """
         self._data = pd.DataFrame()
         
-        self._data = self.__parsePage(cf.CLOSED_BOND_FUND_URL, cf.CLOSED_BOND_FUND_COLS)
+        self._data = self.__pargePageByTimeStamp(cf.CLOSED_BOND_FUND_URL, cf.CLOSED_BOND_FUND_COLS)
         self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
         for col in ['left_year', 'est_val', 'discount_rt', 'annual_discount_rt', 'trade_price',
                     'increase_rt', 'volume', 'fund_nav', 'price_incr_rt', 'stock_ratio', 'bond_ratio']:
-            self._data[col] = self._data[col].astype(float)
-            
-        return self._result()
-    
-    
-    def AHRatio(self):
-        """
-        A/H比价
-        return
-        ------
-        DataFrame or List: [{'a_code':, 'stock_name':, ...}, ...]
-            a_code:                A股代码
-            stock_name:            股票名称
-            a_price:               A股价格
-            a_increase_rt：        A股涨跌幅（％）
-            h_code:                H股代码
-            h_price:               H股价格（港元）
-            h_increase_rt：        H股涨跌幅（％）
-            last_time:            最后时间
-            rmb_price：            H股价格（人民币）
-            hk_currency：          港元汇率
-            ha_ratio：             比价（H/A）
-            h_free_shares:        H股自由流通市值（亿港元）
-            a_free_shares：        A股自由流通市值（亿元）
-        """
-        self._data = pd.DataFrame()
-        
-        self._data = self.__parsePage(cf.AH_RATIO_URL, cf.AH_RATIO_COLS)
-        self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
-        for col in ['a_price', 'a_increase_rt', 'h_price', 'h_increase_rt', 'rmb_price',
-                    'hk_currency', 'ha_ratio', 'h_free_shares', 'a_free_shares']:
             self._data[col] = self._data[col].astype(float)
             
         return self._result()
@@ -414,7 +384,7 @@ class LowRiskIntArb(Base):
     
     def stockLof(self):
         """
-                            股票LOF基金及基相关数据
+        股票LOF基金及基相关数据
         return
         ------
         DataFrame or List: [{'fund_id':, 'fund_nm':, ...}, ...]
@@ -447,7 +417,7 @@ class LowRiskIntArb(Base):
     
     def indexLof(self):
         """
-                            指数LOF基金及基相关数据
+        指数LOF基金及基相关数据
         return
         ------
         DataFrame or List: [{'fund_id':, 'fund_nm':, ...}, ...]
@@ -479,7 +449,7 @@ class LowRiskIntArb(Base):
         return self._result()
     
     
-    def __parsePage(self, url, column):            
+    def __parsePage(self, url, column):
         page = 1
         while(True):
             try:
@@ -493,12 +463,27 @@ class LowRiskIntArb(Base):
                 for row in dataDict['rows']:
                     dataList.append(row['cell'])
                   
-                self._data = self._data.append(pd.DataFrame(dataList, columns = column), ignore_index=True)
+                self._data = self._data.append(pd.DataFrame(dataList, columns=column), ignore_index=True)
                 
                 page += 1
             except Exception as e:
                 print(str(e))
-            
+
         return self._data
-    
-    
+
+
+    def __pargePageByTimeStamp(self, url, column):
+        timestamp = int(time.time()*1000)
+        try:
+            request = self._session.get(url % timestamp)
+            text = request.text.replace('%', '')
+            dataDict = json.loads(text)
+            dataList = []
+            for row in dataDict['rows']:
+                dataList.append(row['cell'])
+              
+            self._data = self._data.append(pd.DataFrame(dataList, columns = column), ignore_index=True)
+        except Exception as e:
+            print(str(e))
+
+        return self._data

@@ -229,7 +229,7 @@ class StockData(Base):
         # http://hq.sinajs.cn/rn=4879967949085&list=sh600000,sh600004
         request = self._session.get( cf.LIVE_DATA_URL % (Utility.random(), symbols_list), timeout=10 )
         request.encoding = 'gbk'
-        reg = re.compile(r'\="(.*?)\";')
+        reg = re.compile(r'="(.*?),";')
         data = reg.findall(request.text)
         regSym = re.compile(r'(?:sh|sz)(.*?)\=')
         syms = regSym.findall(request.text)
@@ -241,14 +241,15 @@ class StockData(Base):
                 syms_list.append(syms[index])
         if len(syms_list) == 0:
             return None
-        
+
         self._data = pd.DataFrame(data_list, columns=cf.LIVE_DATA_COLS)
         self._data = self._data.drop('s', axis=1)
         self._data['code'] = syms_list
         ls = [cls for cls in self._data.columns if '_v' in cls]
         for txt in ls:
             self._data[txt] = self._data[txt].map(lambda x : x[:-2])
-            
+        
+        self._data[self._data.astype(str)==""] = 0
         # 价格、成交量等转换为浮点类型
         for col in ['open', 'pre_close', 'price', 'high', 'low', 'bid', 'ask', 'volume','amount',
                     'b1_v', 'b1_p', 'b2_v', 'b2_p', 'b3_v', 'b3_p', 'b4_v', 'b4_p', 'b5_v', 'b5_p',

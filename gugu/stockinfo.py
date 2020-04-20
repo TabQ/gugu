@@ -8,81 +8,116 @@ Created on 2019/01/02
 """
 from __future__ import division
 
-import time
 import pandas as pd
 from pandas.compat import StringIO
+import json
 import lxml.html
 from lxml import etree
+import random
 import re
+import time
 from gugu.utility import Utility
 from gugu.base import Base, cf
+import sys
+
+ua_list = [
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.71',
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 5.1; U; en; rv:1.8.1) Gecko/20061208 Firefox/2.0.0 Opera 9.50',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:34.0) Gecko/20100101 Firefox/34.0',
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0',
+]
+headers = {
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+    'User-Agent': random.choice(ua_list),
+    'Cache-Control': 'max-age=0',
+}
 
 class StockInfo(Base):
-    def stockProfiles(self, retry=3, pause=0.001):
+    def stockProfiles(self):
         """
-        获取上市公司基本情况
-        Parameters
-        --------
-        retry : int, 默认 3
-                     如遇网络等问题重复执行的次数 
-        pause : int, 默认 0
-                    重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-                    
+        获取上市公司基于基本面的汇总数据信息
         Return
         --------
-        DataFrame or List: [{'code':, 'name':, ...}, ...]
-                   code,代码
-                   name,名称
-                   city,所在城市
-                   staff,员工人数
-                   date,上市日期
-                   industry,行业分类
-                   pro_type,产品类型
-                   main,主营业务
+        DataFrame or List: [{'symbol':, 'net_profit_cagr':, ...}, ...]
+                   symbol:                  代码
+                   net_profit_cagr:         净利润复合年均增长率
+                   ps:                      市销率
+                   percent：                涨幅
+                   pb_ttm：                 滚动市净率
+                   float_shares：           流通股本
+                   current：                当前价格
+                   amplitude：              振幅
+                   pcf：                    市现率
+                   current_year_percent：   今年涨幅
+                   float_market_capital：   流通市值
+                   market_capital：         总市值
+                   dividend_yield：         股息率
+                   roe_ttm：                滚动净资产收益率
+                   total_percent：          总涨幅
+                   income_cagr：            收益复合年均增长率
+                   amount：                 成交额
+                   chg：                    涨跌点数
+                   issue_date_ts：          发行日unix时间戳
+                   main_net_inflows：       主营净收入
+                   volume：                 成交量
+                   volume_ratio：           量比
+                   pb:                      市净率
+                   followers：              雪球网关注人数
+                   turnover_rate：          换手率
+                   name：                   名称
+                   pe_ttm：                 滚动市盈率
+                   total_shares：           总股本
         """
         self._data = pd.DataFrame()
         
         self._writeHead()
         
-        date = '%s-12-31' % Utility.getYear()
-        self._data = pd.DataFrame()
-        
-        self._data = self.__handleStockProfiles(self._data, date, 1, retry, pause)
+        self._data = self.__handleStockProfiles()
+        self._data['issue_date_ts'] = self._data['issue_date_ts'].map(lambda x: int(x/1000))
         
         return self._result()
-    
-    
-    def __handleStockProfiles(self, dataArr, date, page, retry, pause):
-        self._writeConsole()
-        
-        for _ in range(retry):
-            time.sleep(pause)
-            
+
+    def __handleStockProfiles(self):
+        try:
+            request = self._session.get(cf.XQ_HOME, headers=headers)
+            cookies = request.cookies
+        except Exception as e:
+            print(str(e))
+
+        page = 1
+        while True:
+            self._writeConsole()
+
             try:
-                html = lxml.html.parse(cf.ALL_STOCK_PROFILES_URL % (date, page))
-                res = html.xpath('//table[@id="myTable04"]/tbody/tr')
-                if not res:
-                    return dataArr
-                
-                if self._PY3:
-                    sarr = [etree.tostring(node).decode('utf-8') for node in res]
-                else:
-                    sarr = [etree.tostring(node) for node in res]
-                sarr = ''.join(sarr)
-                sarr = '<table>%s</table>' % sarr
-                
-                df = pd.read_html(sarr)[0]
-                df = df.drop([0, 3, 5, 6, 7, 10, 11], axis = 1)
-                df.columns = cf.ALL_STOCK_PROFILES_COLS
-                df['code'] = df['code'].map(lambda x: str(x).zfill(6))
-                
-                dataArr = dataArr.append(df, ignore_index=True)
+                timestamp = int(time.time()*1000)
+                request = self._session.get(cf.XQ_STOCK_PROFILES_URL % (page, timestamp), headers=headers, cookies=cookies)
+
+                dataDict = json.loads(request.text)
+                if not dataDict.get('data').get('list'):
+                    break
+
+                dataList = []
+                for row in dataDict.get('data').get('list'):
+                    dataList.append(row)
+
+                self._data = self._data.append(pd.DataFrame(dataList, columns=cf.XQ_STOCK_PROFILES_COLS), ignore_index=True)
+
+                page += 1
+                time.sleep(1)
             except Exception as e:
-                print(e)
-            else:
-                return self.__handleStockProfiles(dataArr, date, page+1, retry, pause)
-        
-    
+                print(str(e))
+
+        return self._data
+
     def report(self, year, quarter, retry=3, pause=0.001):
         """
         获取业绩报表数据
@@ -333,7 +368,5 @@ class StockInfo(Base):
                     return dataArr
             except Exception as e:
                 print(e)
-                
+
         raise IOError(cf.NETWORK_URL_ERROR_MSG)
-    
-    

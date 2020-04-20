@@ -13,6 +13,7 @@ import json
 import time
 from gugu.utility import Utility
 from gugu.base import Base, cf
+import sys
 
 
 class Macro(Base):
@@ -338,7 +339,7 @@ class Macro(Base):
         return self._result()
     
     
-    def montySupply(self, retry=3, pause=0.001):
+    def moneySupply(self, retry=3, pause=0.001):
         """
         获取货币供应量数据
         Parameters
@@ -520,12 +521,13 @@ class Macro(Base):
         return self._result()
     
     
-    def lpr(self, year=None):
+    def lpr(self, startDate, endDate=None):
         """
         获取贷款基础利率
         Parameters
         ------
-          year:年份(int)
+          startDate:开始日期(格式：YYYY-MM-DD)
+          endDate:结束日期(格式：YYYY-MM-DD，为None时默认取当前日期)
           
         Return
         ------
@@ -535,39 +537,24 @@ class Macro(Base):
         """
         self._data = pd.DataFrame()
         
-        lab = cf.SHIBOR_TYPE['LPR']
-        self._data = self.__parseExcel(year, 'LPR', lab, cf.LPR_COLS)
+        if endDate is None:
+            endDate = Utility.getToday()
+
+        request = self._session.get(cf.LPR_URL % (startDate, endDate))
+        dataDict = json.loads(request.text)
+        dataList = []
+        for row in dataDict['records']:
+            data = {'date': row['showDateCN'], '1Y': float(row['1Y'])}
+            dataList.append(data)
+        self._data = pd.DataFrame(dataList, columns=cf.LPR_COLS)
         
         return self._result()
-    
-    
-    def lprMa(self, year=None):
-        """
-        获取贷款基础利率均值数据
-        Parameters
-        ------
-          year:年份(int)
-          
-        Return
-        ------
-        DataFrame or List: [{'date':, '1Y_5':, ...}, ...]
-            date:日期
-            1Y_5:5日均值
-            1Y_10:10日均值
-            1Y_20:20日均值
-        """
-        self._data = pd.DataFrame()
-        
-        lab = cf.SHIBOR_TYPE['LPR_Tendency']
-        self._data = self.__parseExcel(year, 'LPR_Tendency', lab, cf.LPR_MA_COLS)
-        
-        return self._result()
-        
-        
+
+
     def __parseExcel(self, year, datatype, lab, column):
         year = Utility.getYear() if year is None else year
         lab = lab.encode('utf-8') if self._PY3 else lab
-        
+
         try:
             df = pd.read_excel( cf.SHIBOR_DATA_URL % (datatype, year, lab, year), skiprows=[0] )
             df.columns = column
@@ -577,5 +564,3 @@ class Macro(Base):
             print(e)
         else:
             return df
-        
-        
