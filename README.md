@@ -8,13 +8,6 @@ gugu(股估)是适用于金融/投资领域数据分析及量化工程的开源�
 使用前提：
 
     python 2.x/3.x
-    
-    pandas 安装：pip install pandas or pip3 install pandas
-
-    lxml 安装：pip install lxml or pip3 install lxml
-
-    xlrd 安装：pip install xlrd or pip3 install xlrd
-
 
 安装方式：
 
