@@ -325,6 +325,14 @@ Quick Start
 
 Change Log:
 
+    0.1.8 2020/04/20
+    (1)Classify类中方法byIndustry去掉按申万行业(sw)获取行业分类数据，保留只使用按新浪行业(sina)获取行业分类数据
+    (2)LowRiskIntArb类中去掉获取A/H比价数据方法AHRatio
+    (3)Macro类中将montySupply方法更名为moneySupply；去掉获取贷款基础利率均值数据方法lprMa
+    (4)StockInfo类中方法stockProfiles经过重新修订可以高效获取上市公司基于基本面的汇总数据信息
+    (5)修复了N多因网页数据格式更改造成的某些api失效或错误的问题
+    (6)修复部分bugs
+
     0.1.7 2019/04/09
     (1)修改pandas.DataFrame的某些用法以适应pandas更高版本
     (2)修复部分bug

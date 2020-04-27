@@ -213,11 +213,16 @@ class LowRiskIntArb(Base):
         
         self._data = self.__parsePage(cf.CON_BONDS_URL, cf.CON_BONDS_COLS)
         self._data = self._data.applymap(lambda x: np.NaN if x == "-" else x)
+
+        if self._PY3:
+            self._data['sincrease_rt'] = self._data['sincrease_rt'].map(lambda x: 0 if x == "停牌" else x)
+        else:
+            self._data['sincrease_rt'] = self._data['sincrease_rt'].map(lambda x: 0 if x.encode('utf-8') == "停牌" else x)
+        
         for col in ['convert_price', 'put_price', 'redeem_price', 'redeem_price_ratio', 'orig_iss_amt',
                     'curr_iss_amt', 'ration_rt', 'pb', 'sprice', 'sincrease_rt', 'convert_value', 'premium_rt',
                     'year_left', 'ytm_rt', 'ytm_rt_tax', 'price', 'increase_rt', 'volume', 'force_redeem_price',
                     'put_convert_price', 'convert_amt_ratio']:
-            self._data[col] = self._data[col].map(lambda x: 0 if isinstance(x, str) and x.encode('utf-8') == "停牌" else x)
             self._data[col] = self._data[col].astype(float)
             
         return self._result()
