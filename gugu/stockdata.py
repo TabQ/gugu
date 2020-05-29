@@ -225,11 +225,11 @@ class StockData(Base):
         else:
             symbols_list = Utility.symbol(self.__code)
         symbols_list = symbols_list[:-1] if len(symbols_list) > 8 else symbols_list
-        
+
         # http://hq.sinajs.cn/rn=4879967949085&list=sh600000,sh600004
         request = self._session.get( cf.LIVE_DATA_URL % (Utility.random(), symbols_list), timeout=10 )
         request.encoding = 'gbk'
-        reg = re.compile(r'="(.*?),";')
+        reg = re.compile(r'="(.*?),?";')
         data = reg.findall(request.text)
         regSym = re.compile(r'(?:sh|sz)(.*?)\=')
         syms = regSym.findall(request.text)
