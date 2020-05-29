@@ -16,7 +16,7 @@ from urllib3.util import Retry
 import gugu.config as cf
 
 class Utility():
-    @staticmethod    
+    @staticmethod
     def str2Dict(string):
         string = eval(string, type('Dummy', (dict,), dict(__getitem__ = lambda s, n:n))())
         string = json.dumps(string)
@@ -69,6 +69,13 @@ class Utility():
         elif len(code) != 6 :
             return ''
         else:
+            # 可转债代码
+            cb_code = code[:2]
+            if cb_code == '11':
+                return 'sh%s' % code
+            if cb_code == '12':
+                return 'sz%s' % code
+
             return 'sh%s' % code if code[:1] in ['5', '6', '9'] else 'sz%s' % code 
         
         
