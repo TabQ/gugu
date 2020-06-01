@@ -112,8 +112,9 @@ class MarketData(Base):
         
         reg = re.compile(r'\,(.*?)\:')
         text = reg.sub(r',"\1":', text)
-        text = text.replace('"{symbol', '{"symbol')
+        text = text.replace('"{"symbol', '{"symbol')
         text = text.replace('{symbol', '{"symbol"')
+        text = text.replace('""', '"')
         jstr = json.dumps(text)
         js = json.loads(jstr)
         df = pd.DataFrame(pd.read_json(js, dtype={'code':object}), columns=cf.DAY_TRADING_COLUMNS)
