@@ -383,7 +383,7 @@ class StockData(Base):
                 # http://vip.stock.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_Transactions.getAllPageTime?date=2018-12-26&symbol=sh600000
                 request = self._session.get( cf.TODAY_TICKS_PAGE_URL % (date, symbol), timeout=10 )
                 request.encoding = 'gbk'
-                text = request.text[1:-1]
+                text = request.text
                 data_dict = Utility.str2Dict(text)
                 pages = len(data_dict['detailPages'])
                 
